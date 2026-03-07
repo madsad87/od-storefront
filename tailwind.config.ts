@@ -6,12 +6,21 @@ export default {
   theme: {
     extend: {
       borderRadius: {
-        lg: ".5625rem", /* 9px */
-        md: ".375rem", /* 6px */
-        sm: ".1875rem", /* 3px */
+        lg: ".5625rem",
+        md: ".375rem",
+        sm: ".1875rem",
       },
       colors: {
-        // Flat / base colors (regular buttons)
+        gold: {
+          DEFAULT: "#C9A84C",
+          light: "#D4B85E",
+          dark: "#B8943A",
+        },
+        brand: {
+          black: "#000000",
+          dark: "#111111",
+          offwhite: "#F5F5F0",
+        },
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
         border: "hsl(var(--border) / <alpha-value>)",
@@ -73,7 +82,7 @@ export default {
         "sidebar-accent": {
           DEFAULT: "hsl(var(--sidebar-accent) / <alpha-value>)",
           foreground: "hsl(var(--sidebar-accent-foreground) / <alpha-value>)",
-          border: "var(--sidebar-accent-border)"
+          border: "var(--sidebar-accent-border)",
         },
         status: {
           online: "rgb(34 197 94)",
@@ -86,6 +95,8 @@ export default {
         sans: ["var(--font-sans)"],
         serif: ["var(--font-serif)"],
         mono: ["var(--font-mono)"],
+        heading: ['"Playfair Display"', '"Cormorant Garamond"', "Georgia", "serif"],
+        body: ['"DM Sans"', "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
@@ -96,10 +107,24 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "fade-in-up": {
+          "0%": { opacity: "0", transform: "translateY(30px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        marquee: "marquee 25s linear infinite",
+        "fade-in-up": "fade-in-up 0.8s ease-out forwards",
+      },
+      letterSpacing: {
+        "ultra-wide": "0.25em",
+        brand: "0.2em",
       },
     },
   },
