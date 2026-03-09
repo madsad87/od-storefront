@@ -1,5 +1,8 @@
 # Outlaw Dolls — Faust.js / Next.js Migration Guide
 
+> Foundation migration audit content has moved to `docs/migration/faust-foundation.md`.
+> Keep this file focused on implementation-level porting steps.
+
 ## Overview
 
 This codebase has been pre-structured for migration to Faust.js (Next.js) + WooCommerce.
