@@ -1,9 +1,13 @@
 import type { GetStaticPaths, GetStaticProps } from "next";
-import { getNextStaticProps, is404, WordPressTemplate } from "@faustwp/core";
+import { getNextStaticProps, WordPressTemplate } from "@faustwp/core";
 import { templates } from "@/wp-templates";
 
 export default function WordPressNode(props: any) {
-  if (is404(props)) {
+  const hasWordPressNode = Boolean(
+    props?.seedNode ?? props?.__SEED_NODE__ ?? props?.data?.nodeByUri ?? props?.data?.node,
+  );
+
+  if (!hasWordPressNode) {
     const NotFound = templates.notFound;
     return <NotFound />;
   }
