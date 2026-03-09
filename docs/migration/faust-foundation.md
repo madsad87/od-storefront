@@ -5,10 +5,11 @@ This document is the canonical location for the current migration audit delivera
 ## Audit Deliverables Snapshot
 
 ### Current Platform Baseline
-- **Frontend:** React + TypeScript (Vite SPA), Tailwind CSS, Wouter abstraction for routing, Framer Motion animations.
+- **Frontend runtime:** Next.js app (`npm run dev` / `next dev`) with migration-era Vite-compatible modules still present.
+- **Source-tree note:** both `src/` and `client/src/` include migration scaffolding; active checkout/WordPress integration utilities currently live under `client/src/`.
 - **Backend:** Minimal Express server for static/API support.
-- **Cart:** Local `CartContext` state management.
-- **Catalog Data:** Mock catalog in `client/src/data/products.ts` pending WooCommerce integration.
+- **Cart:** Local `CartContext` state management with documented WooGraphQL swap points.
+- **Catalog Data:** Mock catalog remains present pending full WooCommerce wiring.
 
 ### Migration Target
 - **Framework:** Faust.js (Next.js) on WP Engine Atlas.
@@ -20,7 +21,7 @@ This document is the canonical location for the current migration audit delivera
 2. **Product adapter layer** via `client/src/lib/product-types.ts` (`adaptWooProduct`).
 3. **GraphQL query/mutation stubs** in `client/src/graphql/queries.ts` and `client/src/graphql/mutations.ts`.
 4. **Cart swap points** identified in `client/src/context/CartContext.tsx`.
-5. **Props-driven page contracts** in Home / Shop / ProductDetail to allow data-source replacement.
+5. **Checkout redirect strategy** in `client/src/features/checkout/checkout-strategy.ts`.
 
 ### Design System Constraints (Migration Invariants)
 - **Colors:** `#000000`, `#0A0A0A`, `#F5F0E8`, `#C9A84C`.
@@ -32,7 +33,7 @@ This document is the canonical location for the current migration audit delivera
 ### Objectives
 - Establish Next.js/Faust bootstrapping and app shell patterns.
 - Port shared styles/tokens and confirm visual parity baseline.
-- Move migration planning/docs to `docs/migration/` as source of truth.
+- Keep migration planning/docs in `docs/migration/` as source of truth.
 - Confirm WordPress/Woo plugin and environment prerequisites.
 
 ### Done Criteria
@@ -44,4 +45,11 @@ This document is the canonical location for the current migration audit delivera
 ## Source Notes
 This document consolidates and supersedes migration-audit content previously kept in:
 - `replit.md`
+- `src/MIGRATION_GUIDE.md`
 - `client/src/MIGRATION_GUIDE.md`
+
+## Related Migration Docs
+- `docs/migration/wordpress-woocommerce-integration.md`
+- `docs/migration/integration-checklist.md`
+- `docs/migration/staging-smoke-tests.md`
+- `docs/migration/branching.md`
