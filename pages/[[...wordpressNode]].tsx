@@ -17,7 +17,7 @@ export default function WordPressNode(props: any) {
 
 export const getStaticProps: GetStaticProps = (ctx) => {
   return getNextStaticProps(ctx, {
-    templates,
+    Page: WordPressNode,
   });
 };
 
