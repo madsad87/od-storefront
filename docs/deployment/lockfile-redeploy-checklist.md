@@ -2,33 +2,59 @@
 
 Date: 2026-03-09
 
-## 1) Verify `package-lock.json` exists and is tracked
+Use this checklist when validating a redeploy under the current lockfile policy.
 
-- `package-lock.json` restored at repo root and committed to git.
-- `.gitignore` does not ignore `package-lock.json`.
+## 1) Confirm lockfile policy for this repo
 
-## 2) Confirm deploy target branch/SHA
+Current policy is **required lockfile**:
+
+- `package-lock.json` is expected at repo root.
+- Deploy/install validation should be performed against the committed lockfile.
+
+## 2) Verify committed `package-lock.json` state
+
+Before redeploy, validate locally against git:
+
+```bash
+git ls-files --error-unmatch package-lock.json
+```
+
+```bash
+git rev-parse HEAD:package-lock.json
+```
+
+```bash
+git status --short package-lock.json
+```
+
+Expected results:
+
+- `package-lock.json` is tracked.
+- `HEAD` includes `package-lock.json`.
+- Working tree is clean for `package-lock.json` (no uncommitted lockfile edits).
+
+## 3) Confirm deploy target branch/SHA
 
 Use these values when validating your hosting dashboard deploy target:
 
-- Branch: `work`
-- Commit SHA: `<commit that includes package-lock.json>`
+- Branch: `<branch being deployed>`
+- Commit SHA: `<commit being deployed (must include package-lock.json)>`
 
-## 3) Clear cache + redeploy
+## 4) Clear cache + redeploy
 
 In your hosting provider dashboard, trigger a deploy with:
 
 - cached source cleared (if available)
 - build cache cleared (if available)
 
-## 4) Verify install logs are lockfile-aware
+## 5) Verify install logs use the committed lockfile
 
-In build logs, confirm one of the following:
+In build logs, confirm lockfile-aware install behavior (for example):
 
-- `npm ci` is used, or
-- install runs without any lockfile-missing warning
+- install command is `npm ci`, **or**
+- npm reports it is using `package-lock.json` with no lockfile-missing warnings/errors.
 
-## 5) Use deterministic install command
+## 6) Prefer deterministic install command
 
 If your host supports custom install command, set:
 
@@ -36,4 +62,4 @@ If your host supports custom install command, set:
 npm ci
 ```
 
-This ensures dependency resolution uses `package-lock.json` exactly.
+This ensures dependency resolution follows committed `package-lock.json` exactly.
