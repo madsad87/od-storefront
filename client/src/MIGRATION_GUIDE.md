@@ -147,6 +147,8 @@ const addItem = async (product, size) => {
 **Recommended for dropshipping:** Hybrid checkout — redirect to WooCommerce native checkout.
 This gives you all payment gateways (Stripe, PayPal, etc.) without rebuilding them.
 
+**Operational expectation:** payment gateway configuration and runtime (authorization, capture, 3DS/SCA flows, fraud tooling, retries, wallet support) continue to live in WooCommerce plugins. The storefront should only initiate checkout and pass session context.
+
 ```tsx
 const handleCheckout = () => {
   window.location.href = `${process.env.NEXT_PUBLIC_WORDPRESS_URL}/checkout`;
