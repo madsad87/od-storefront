@@ -1,8 +1,24 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { AppLink } from "../lib/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, Check } from "lucide-react";
 import { useCart } from "../context/CartContext";
+
+/**
+ * MIGRATION NOTE:
+ * For WooCommerce, two checkout strategies:
+ *
+ * 1. HYBRID (Recommended for dropshipping):
+ *    Redirect to WooCommerce native checkout page.
+ *    const checkoutUrl = `${WORDPRESS_URL}/checkout?session=${sessionToken}`;
+ *    window.location.href = checkoutUrl;
+ *    This leverages existing payment gateway integrations (Stripe, PayPal, etc.)
+ *
+ * 2. FULLY HEADLESS:
+ *    Use the CHECKOUT mutation from graphql/mutations.ts.
+ *    Requires rebuilding payment gateway integration on the frontend.
+ *    More complex but keeps the user on your domain.
+ */
 
 export default function Checkout() {
   const { items, subtotal, clearCart } = useCart();
@@ -49,13 +65,13 @@ export default function Checkout() {
           <p className="text-brand-offwhite/50 mb-8 font-body leading-relaxed">
             Your rebellion has been shipped. Expect the extraordinary to arrive at your door soon.
           </p>
-          <Link
+          <AppLink
             href="/shop"
             data-testid="link-continue-shopping-confirmed"
             className="inline-flex items-center gap-2 border border-gold text-gold px-8 py-3 text-xs uppercase tracking-widest font-body hover:bg-gold hover:text-black transition-all duration-500 rounded-md"
           >
             Continue Shopping
-          </Link>
+          </AppLink>
         </motion.div>
       </div>
     );
@@ -68,13 +84,13 @@ export default function Checkout() {
           <h1 className="font-heading text-3xl text-brand-offwhite mb-4">
             Nothing to Checkout
           </h1>
-          <Link
+          <AppLink
             href="/shop"
             data-testid="link-go-shopping"
             className="text-gold text-sm uppercase tracking-wider font-body"
           >
             Start Shopping
-          </Link>
+          </AppLink>
         </div>
       </div>
     );
@@ -91,14 +107,14 @@ export default function Checkout() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Link
+          <AppLink
             href="/cart"
             data-testid="link-back-to-cart"
             className="inline-flex items-center gap-2 text-sm text-brand-offwhite/50 hover:text-gold transition-colors duration-300 mb-8 uppercase tracking-wider font-body"
           >
             <ArrowLeft className="w-3 h-3" />
             Back to Cart
-          </Link>
+          </AppLink>
 
           <h1 className="font-heading text-4xl sm:text-5xl text-brand-offwhite mb-12">
             Checkout

@@ -1,12 +1,17 @@
-import { Link } from "wouter";
+import { AppLink } from "../lib/navigation";
+import type { Product } from "../lib/product-types";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Marquee from "../components/Marquee";
 import ProductCard from "../components/ProductCard";
-import { products } from "../data/products";
+import { products as allProducts } from "../data/products";
 
-export default function Home() {
-  const featured = products.slice(0, 3);
+interface HomeProps {
+  featuredProducts?: Product[];
+}
+
+export default function Home({ featuredProducts }: HomeProps) {
+  const featured = featuredProducts || allProducts.slice(0, 3);
 
   return (
     <div>
@@ -47,14 +52,14 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <Link
+            <AppLink
               href="/shop"
               data-testid="button-shop-now"
               className="inline-flex items-center gap-3 border border-gold text-gold px-8 py-3.5 text-xs sm:text-sm uppercase tracking-widest font-body font-medium hover:bg-gold hover:text-black transition-all duration-500 group rounded-md"
             >
               Shop Now
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
+            </AppLink>
           </motion.div>
         </div>
 
@@ -86,13 +91,13 @@ export default function Home() {
               Featured Pieces
             </h2>
           </div>
-          <Link
+          <AppLink
             href="/shop"
             data-testid="link-view-all"
             className="text-sm text-brand-offwhite/50 hover:text-gold transition-colors duration-300 uppercase tracking-wider font-body whitespace-nowrap"
           >
             View All
-          </Link>
+          </AppLink>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -148,14 +153,14 @@ export default function Home() {
               Every piece in our collection is designed to make you feel dangerous, beautiful, 
               and completely yourself. We don't design for the ordinary — we design for the unforgettable.
             </p>
-            <Link
+            <AppLink
               href="/about"
               data-testid="link-about-cta"
               className="text-sm text-gold uppercase tracking-wider font-body hover:text-gold-light transition-colors duration-300 inline-flex items-center gap-2"
             >
               Our Story
               <ArrowRight className="w-3 h-3" />
-            </Link>
+            </AppLink>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, x: 30 }}

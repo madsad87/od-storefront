@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { AppLink } from "../lib/navigation";
 import { motion } from "framer-motion";
 import { Minus, Plus, X, ArrowLeft, ShoppingBag } from "lucide-react";
 import { useCart } from "../context/CartContext";
@@ -22,13 +22,13 @@ export default function Cart() {
           <p className="text-brand-offwhite/50 mb-8 font-body">
             Time to fill it with something dangerous.
           </p>
-          <Link
+          <AppLink
             href="/shop"
             data-testid="link-continue-shopping"
             className="inline-flex items-center gap-2 border border-gold text-gold px-8 py-3 text-xs uppercase tracking-widest font-body hover:bg-gold hover:text-black transition-all duration-500 rounded-md"
           >
             Continue Shopping
-          </Link>
+          </AppLink>
         </motion.div>
       </div>
     );
@@ -42,14 +42,14 @@ export default function Cart() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <Link
+          <AppLink
             href="/shop"
             data-testid="link-back-to-shop"
             className="inline-flex items-center gap-2 text-sm text-brand-offwhite/50 hover:text-gold transition-colors duration-300 mb-8 uppercase tracking-wider font-body"
           >
             <ArrowLeft className="w-3 h-3" />
             Continue Shopping
-          </Link>
+          </AppLink>
 
           <h1 className="font-heading text-4xl sm:text-5xl text-brand-offwhite mb-12">
             Your Cart
@@ -67,7 +67,7 @@ export default function Cart() {
                 data-testid={`cart-item-${item.product.id}-${item.size}`}
                 className="flex gap-4 sm:gap-6 pb-6 border-b border-white/5"
               >
-                <Link href={`/product/${item.product.id}`} className="shrink-0">
+                <AppLink href={`/product/${item.product.slug || item.product.id}`} className="shrink-0">
                   <div className="w-20 h-24 sm:w-24 sm:h-32 overflow-hidden bg-brand-dark">
                     <img
                       src={item.product.image}
@@ -75,7 +75,7 @@ export default function Cart() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                </Link>
+                </AppLink>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-3">
@@ -168,13 +168,13 @@ export default function Cart() {
                   </span>
                 </div>
               </div>
-              <Link
+              <AppLink
                 href="/checkout"
                 data-testid="button-checkout"
                 className="block w-full bg-gold text-black text-center py-3.5 text-xs uppercase tracking-widest font-body font-bold hover:opacity-90 transition-opacity duration-300 rounded-md"
               >
                 Proceed to Checkout
-              </Link>
+              </AppLink>
             </div>
           </motion.div>
         </div>

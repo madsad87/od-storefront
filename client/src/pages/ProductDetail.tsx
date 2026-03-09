@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useRoute, Link } from "wouter";
+import { AppLink } from "../lib/navigation";
+import type { Product } from "../lib/product-types";
 import { motion } from "framer-motion";
 import { ArrowLeft, Minus, Plus } from "lucide-react";
 import { useCart } from "../context/CartContext";
@@ -7,34 +8,50 @@ import { products } from "../data/products";
 import ProductCard from "../components/ProductCard";
 import { useToast } from "@/hooks/use-toast";
 
-export default function ProductDetail() {
-  const [, params] = useRoute("/product/:id");
-  const productId = Number(params?.id);
-  const product = products.find((p) => p.id === productId);
+/**
+ * MIGRATION NOTE:
+ * In Next.js / Faust.js, this page becomes pages/product/[slug].tsx
+ * - Product data comes from getStaticProps via GET_PRODUCT_BY_SLUG query
+ * - Related products come from the `related` field in the query
+ * - The `identifier` prop maps to router.query.slug in Next.js
+ * - Pass product and relatedProducts as props from getStaticProps
+ */
+
+interface ProductDetailProps {
+  identifier?: string;
+  product?: Product;
+  relatedProducts?: Product[];
+}
+
+export default function ProductDetail({ identifier, product: propProduct, relatedProducts: propRelated }: ProductDetailProps) {
+  const resolvedProduct = propProduct || (identifier
+    ? products.find((p) => p.slug === identifier || p.id === Number(identifier))
+    : undefined);
+
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const { toast } = useToast();
 
-  if (!product) {
+  if (!resolvedProduct) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="font-heading text-3xl text-brand-offwhite mb-4">Product Not Found</h1>
-          <Link
+          <AppLink
             href="/shop"
             data-testid="link-back-to-shop"
             className="text-gold text-sm uppercase tracking-wider"
           >
             Back to Shop
-          </Link>
+          </AppLink>
         </div>
       </div>
     );
   }
 
-  const relatedProducts = products
-    .filter((p) => p.id !== product.id)
+  const relatedProducts = propRelated || products
+    .filter((p) => p.id !== resolvedProduct.id)
     .slice(0, 3);
 
   const handleAddToCart = () => {
@@ -47,11 +64,11 @@ export default function ProductDetail() {
       return;
     }
     for (let i = 0; i < quantity; i++) {
-      addItem(product, selectedSize);
+      addItem(resolvedProduct, selectedSize);
     }
     toast({
       title: "Added to cart",
-      description: `${product.name} (${selectedSize}) x${quantity} has been added.`,
+      description: `${resolvedProduct.name} (${selectedSize}) x${quantity} has been added.`,
     });
   };
 
@@ -63,14 +80,14 @@ export default function ProductDetail() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <Link
+          <AppLink
             href="/shop"
             data-testid="link-back-shop"
             className="inline-flex items-center gap-2 text-sm text-brand-offwhite/50 hover:text-gold transition-colors duration-300 mb-8 uppercase tracking-wider font-body"
           >
             <ArrowLeft className="w-3 h-3" />
             Back to Shop
-          </Link>
+          </AppLink>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
@@ -81,8 +98,8 @@ export default function ProductDetail() {
             className="aspect-[3/4] overflow-hidden bg-brand-dark"
           >
             <img
-              src={product.image}
-              alt={product.name}
+              src={resolvedProduct.image}
+              alt={resolvedProduct.name}
               data-testid="img-product-hero"
               className="w-full h-full object-cover"
             />
@@ -101,20 +118,20 @@ export default function ProductDetail() {
               data-testid="text-product-title"
               className="font-heading text-3xl sm:text-4xl md:text-5xl text-brand-offwhite mb-4"
             >
-              {product.name}
+              {resolvedProduct.name}
             </h1>
             <p
               data-testid="text-product-price"
               className="text-2xl text-brand-offwhite/80 font-body mb-8"
             >
-              ${product.price}
+              ${resolvedProduct.price}
             </p>
 
             <p
               data-testid="text-product-description"
               className="text-brand-offwhite/60 leading-relaxed mb-8 font-body"
             >
-              {product.description}
+              {resolvedProduct.description}
             </p>
 
             <div className="mb-8">
@@ -122,7 +139,7 @@ export default function ProductDetail() {
                 Size
               </p>
               <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size) => (
+                {resolvedProduct.sizes.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
@@ -171,7 +188,7 @@ export default function ProductDetail() {
               data-testid="button-add-to-cart"
               className="w-full bg-transparent border border-gold text-gold py-4 text-sm uppercase tracking-widest font-body font-medium hover:bg-gold hover:text-black transition-all duration-500 rounded-md"
             >
-              Add to Cart — ${product.price * quantity}
+              Add to Cart — ${resolvedProduct.price * quantity}
             </button>
 
             <div className="mt-8 pt-8 border-t border-white/5">

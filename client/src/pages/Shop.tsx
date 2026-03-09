@@ -1,8 +1,15 @@
+import type { Product } from "../lib/product-types";
 import { motion } from "framer-motion";
 import ProductCard from "../components/ProductCard";
-import { products } from "../data/products";
+import { products as allProducts } from "../data/products";
 
-export default function Shop() {
+interface ShopProps {
+  products?: Product[];
+}
+
+export default function Shop({ products }: ShopProps) {
+  const displayProducts = products || allProducts;
+
   return (
     <div className="min-h-screen pt-24 sm:pt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 sm:pb-28">
@@ -27,7 +34,7 @@ export default function Shop() {
           data-testid="product-grid"
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
         >
-          {products.map((product) => (
+          {displayProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

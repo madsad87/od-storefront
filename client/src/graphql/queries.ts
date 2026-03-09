@@ -9,9 +9,13 @@
  * 3. Faust.js WordPress plugin (for previews + auth)
  *
  * USAGE WITH APOLLO CLIENT:
- *   import { useQuery } from "@apollo/client";
+ *   import { gql, useQuery } from "@apollo/client";
  *   import { GET_PRODUCTS } from "../graphql/queries";
- *   const { data, loading } = useQuery(GET_PRODUCTS);
+ *   const { data, loading } = useQuery(gql(GET_PRODUCTS));
+ *
+ * NOTE: These queries are exported as template strings. Wrap with gql() from
+ * @apollo/client before passing to useQuery/useMutation, or convert exports
+ * to use gql`` tagged templates after installing @apollo/client.
  *
  * USAGE WITH FAUST.JS getStaticProps:
  *   export async function getStaticProps(context) {

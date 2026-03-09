@@ -15,12 +15,16 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "@/pages/not-found";
 
+function ProductDetailRoute({ params }: { params: { id: string } }) {
+  return <ProductDetail identifier={params.id} />;
+}
+
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/shop" component={Shop} />
-      <Route path="/product/:id" component={ProductDetail} />
+      <Route path="/product/:id" component={ProductDetailRoute} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/about" component={About} />

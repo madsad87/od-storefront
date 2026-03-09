@@ -1,6 +1,6 @@
-import { Link } from "wouter";
+import { AppLink } from "../lib/navigation";
 import { useCart } from "../context/CartContext";
-import type { Product } from "../data/products";
+import type { Product } from "../lib/product-types";
 import { ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +23,8 @@ export default function ProductCard({ product }: ProductCardProps) {
     });
   };
 
+  const productHref = product.slug ? `/product/${product.slug}` : `/product/${product.id}`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -30,7 +32,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5 }}
     >
-      <Link href={`/product/${product.id}`} data-testid={`card-product-${product.id}`}>
+      <AppLink href={productHref} data-testid={`card-product-${product.id}`}>
         <div className="group cursor-pointer">
           <div className="relative overflow-hidden bg-brand-dark mb-4 aspect-[3/4]">
             <img
@@ -66,7 +68,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </p>
           </div>
         </div>
-      </Link>
+      </AppLink>
     </motion.div>
   );
 }

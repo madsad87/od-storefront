@@ -11,10 +11,14 @@
  * Recommended: Use @woographql/session-utils npm package for token management.
  *
  * USAGE:
- *   import { useMutation } from "@apollo/client";
+ *   import { gql, useMutation } from "@apollo/client";
  *   import { ADD_TO_CART } from "../graphql/mutations";
- *   const [addToCart] = useMutation(ADD_TO_CART);
+ *   const [addToCart] = useMutation(gql(ADD_TO_CART));
  *   await addToCart({ variables: { productId: 123, quantity: 1 } });
+ *
+ * NOTE: These mutations are exported as template strings. Wrap with gql() from
+ * @apollo/client before passing to useMutation, or convert exports to use
+ * gql`` tagged templates after installing @apollo/client.
  */
 
 export const ADD_TO_CART = `

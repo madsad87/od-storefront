@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import { AppLink, useAppRouter } from "../lib/navigation";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,7 +8,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { totalItems } = useCart();
-  const [location] = useLocation();
+  const { pathname } = useAppRouter();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -18,7 +18,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setMobileOpen(false);
-  }, [location]);
+  }, [pathname]);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -47,7 +47,7 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4 h-16 sm:h-20">
-            <Link
+            <AppLink
               href="/cart"
               data-testid="link-cart-icon"
               className="relative group"
@@ -62,24 +62,24 @@ export default function Navbar() {
                   {totalItems}
                 </span>
               )}
-            </Link>
+            </AppLink>
 
-            <Link href="/" data-testid="link-logo" className="absolute left-1/2 -translate-x-1/2">
+            <AppLink href="/" data-testid="link-logo" className="absolute left-1/2 -translate-x-1/2">
               <h1 className="font-heading text-lg sm:text-xl tracking-brand text-brand-offwhite uppercase whitespace-nowrap">
                 Outlaw Dolls
               </h1>
-            </Link>
+            </AppLink>
 
             <div className="hidden md:flex items-center gap-8">
               {navLinks.map((link) => (
-                <Link
+                <AppLink
                   key={link.href}
                   href={link.href}
                   data-testid={`link-nav-${link.label.toLowerCase()}`}
                   className="text-sm tracking-wider uppercase text-brand-offwhite/70 transition-colors duration-300 hover:text-gold"
                 >
                   {link.label}
-                </Link>
+                </AppLink>
               ))}
             </div>
 
@@ -112,13 +112,13 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Link
+                <AppLink
                   href={link.href}
                   data-testid={`link-mobile-${link.label.toLowerCase()}`}
                   className="font-heading text-3xl tracking-brand uppercase text-brand-offwhite hover:text-gold transition-colors duration-300"
                 >
                   {link.label}
-                </Link>
+                </AppLink>
               </motion.div>
             ))}
             <motion.div
@@ -126,13 +126,13 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <Link
+              <AppLink
                 href="/cart"
                 data-testid="link-mobile-cart"
                 className="font-heading text-3xl tracking-brand uppercase text-brand-offwhite hover:text-gold transition-colors duration-300"
               >
                 Cart ({totalItems})
-              </Link>
+              </AppLink>
             </motion.div>
           </motion.div>
         )}

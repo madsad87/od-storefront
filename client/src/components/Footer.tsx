@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { AppLink } from "../lib/navigation";
 import { SiInstagram, SiTiktok, SiYoutube } from "react-icons/si";
 import { useToast } from "@/hooks/use-toast";
 
@@ -42,14 +42,14 @@ export default function Footer() {
                 { href: "/contact", label: "Contact" },
                 { href: "/cart", label: "Cart" },
               ].map((link) => (
-                <Link
+                <AppLink
                   key={link.href}
                   href={link.href}
                   data-testid={`link-footer-${link.label.toLowerCase()}`}
                   className="text-sm text-brand-offwhite/50 hover:text-gold transition-colors duration-300"
                 >
                   {link.label}
-                </Link>
+                </AppLink>
               ))}
             </div>
           </div>
