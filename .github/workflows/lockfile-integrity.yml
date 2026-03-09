@@ -1,0 +1,45 @@
+name: Lockfile Integrity
+
+on:
+  pull_request:
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/lockfile-integrity.yml
+
+jobs:
+  lockfile-integrity:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Ensure package-lock.json changes with package.json
+        run: |
+          set -euo pipefail
+
+          base_ref="origin/${{ github.base_ref }}"
+          git fetch --no-tags origin "${{ github.base_ref }}"
+
+          package_json_changed=$(git diff --name-only "$base_ref"...HEAD -- package.json)
+          package_lock_changed=$(git diff --name-only "$base_ref"...HEAD -- package-lock.json)
+
+          if [[ -n "$package_json_changed" && -z "$package_lock_changed" ]]; then
+            echo "package.json changed without a matching package-lock.json update."
+            exit 1
+          fi
+
+      - name: Install dependencies with npm ci
+        run: npm ci
+
+      - name: Verify npm ci did not modify lockfile
+        run: git diff --exit-code -- package-lock.json
