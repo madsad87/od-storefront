@@ -1,4 +1,4 @@
-import { AppLink } from "../lib/navigation";
+import { AppLink, buildProductPath } from "../lib/navigation";
 import { motion } from "framer-motion";
 import { Minus, Plus, X, ArrowLeft, ShoppingBag } from "lucide-react";
 import { useCart } from "../context/CartContext";
@@ -67,7 +67,7 @@ export default function Cart() {
                 data-testid={`cart-item-${item.product.id}-${item.size}`}
                 className="flex gap-4 sm:gap-6 pb-6 border-b border-white/5"
               >
-                <AppLink href={`/product/${item.product.slug || item.product.id}`} className="shrink-0">
+                <AppLink href={buildProductPath(item.product.slug || item.product.id)} className="shrink-0">
                   <div className="w-20 h-24 sm:w-24 sm:h-32 overflow-hidden bg-brand-dark">
                     <img
                       src={item.product.image}

@@ -1,14 +1,15 @@
 import type { Product } from "../lib/product-types";
 import { motion } from "framer-motion";
 import ProductCard from "../components/ProductCard";
-import { products as allProducts } from "../data/products";
+import { useWordpressProducts } from "../lib/wordpress/hooks/products";
 
 interface ShopProps {
   products?: Product[];
 }
 
 export default function Shop({ products }: ShopProps) {
-  const displayProducts = products || allProducts;
+  const { products: wordpressProducts } = useWordpressProducts();
+  const displayProducts = products || wordpressProducts;
 
   return (
     <div className="min-h-screen pt-24 sm:pt-28">

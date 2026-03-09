@@ -1,5 +1,5 @@
-import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
+import { useAppRouter } from "./lib/navigation";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ApolloProvider } from "@apollo/client";
 import { Toaster } from "@/components/ui/toaster";
@@ -17,15 +17,15 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "@/pages/not-found";
 
-function ProductDetailRoute({ params }: { params: { id: string } }) {
-  return <ProductDetail identifier={params.id} />;
-}
-
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/shop" component={Shop} />
+      <Route path="/">
+        <Home />
+      </Route>
+      <Route path="/shop">
+        <Shop />
+      </Route>
       <Route path="/product/:id" component={ProductDetailRoute} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />

@@ -4,8 +4,8 @@ import type { Product } from "../lib/product-types";
 import { motion } from "framer-motion";
 import { ArrowLeft, Minus, Plus } from "lucide-react";
 import { useCart } from "../context/CartContext";
-import { products } from "../data/products";
 import ProductCard from "../components/ProductCard";
+import { useWordpressProduct } from "../lib/wordpress/hooks/products";
 import { useToast } from "@/hooks/use-toast";
 
 /**
@@ -24,9 +24,8 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ identifier, product: propProduct, relatedProducts: propRelated }: ProductDetailProps) {
-  const resolvedProduct = propProduct || (identifier
-    ? products.find((p) => p.slug === identifier || p.id === Number(identifier))
-    : undefined);
+  const { product: wordpressProduct, relatedProducts: wordpressRelated } = useWordpressProduct(identifier);
+  const resolvedProduct = propProduct || wordpressProduct;
 
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -50,9 +49,7 @@ export default function ProductDetail({ identifier, product: propProduct, relate
     );
   }
 
-  const relatedProducts = propRelated || products
-    .filter((p) => p.id !== resolvedProduct.id)
-    .slice(0, 3);
+  const relatedProducts = propRelated || wordpressRelated.filter((p) => p.id !== resolvedProduct.id).slice(0, 3);
 
   const handleAddToCart = () => {
     if (!selectedSize) {
