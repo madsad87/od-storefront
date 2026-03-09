@@ -8,6 +8,8 @@ export default function WordPressNode(props: any) {
     return <NotFound />;
   }
 
+  // The Faust dynamic template route still resolves through getNextStaticProps.
+  // Apollo-powered custom pages do not interfere with this catch-all flow.
   return <WordPressTemplate {...props} />;
 }
 

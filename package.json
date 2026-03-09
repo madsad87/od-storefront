@@ -74,7 +74,8 @@
     "vaul": "^1.1.2",
     "ws": "^8.18.0",
     "zod": "^3.24.2",
-    "zod-validation-error": "^3.4.0"
+    "zod-validation-error": "^3.4.0",
+    "@apollo/client": "^3.11.8"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
