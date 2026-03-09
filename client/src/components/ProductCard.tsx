@@ -1,4 +1,4 @@
-import { AppLink } from "../lib/navigation";
+import { AppLink, buildProductPath } from "../lib/navigation";
 import { useCart } from "../context/CartContext";
 import type { Product } from "../lib/product-types";
 import { ShoppingBag } from "lucide-react";
@@ -23,7 +23,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     });
   };
 
-  const productHref = product.slug ? `/product/${product.slug}` : `/product/${product.id}`;
+  const productHref = buildProductPath(product.slug || product.id);
 
   return (
     <motion.div

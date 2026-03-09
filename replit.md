@@ -1,5 +1,7 @@
 # Outlaw Dolls - E-Commerce Website
 
+> Migration audit deliverables are now maintained in `docs/migration/faust-foundation.md` as the canonical source.
+
 ## Overview
 Dark, edgy e-commerce website for a women's fashion brand called **Outlaw Dolls**. The brand aesthetic is dark, editorial, nighttime energy with powerful femininity. Codebase is pre-structured for migration to Faust.js (Next.js) + WooCommerce via Codex AI.
 
