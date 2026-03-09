@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
+    "preinstall": "node ./script/require-lockfile-ci.cjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
