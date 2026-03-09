@@ -1,26 +1,12 @@
-/**
- * CART CONTEXT
- * =============
- * Manages shopping cart state for the entire app.
- *
- * CURRENT: Local React state (useState) — works as standalone SPA
- * TARGET:  WooCommerce GraphQL mutations via Apollo Client
- *
- * MIGRATION TO WOOGRAPHQL:
- * 1. Replace useState([]) with useQuery(GET_CART) from graphql/queries.ts
- * 2. Replace addItem internals with useMutation(ADD_TO_CART) from graphql/mutations.ts
- * 3. Replace removeItem with useMutation(REMOVE_CART_ITEM)
- * 4. Replace updateQuantity with useMutation(UPDATE_CART_ITEM_QUANTITY)
- * 5. Replace clearCart with useMutation(EMPTY_CART)
- * 6. Session token management: capture woocommerce-session header from responses,
- *    store in localStorage, send as Authorization header on subsequent requests.
- *    Consider @woographql/session-utils package for this.
- *
- * The CartContextType interface stays the same — all UI components continue to
- * call useCart() without any changes. Only the Provider internals change.
- */
-
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { createContext, useCallback, useContext, type ReactNode } from "react";
+import {
+  ADD_TO_CART,
+  EMPTY_CART,
+  REMOVE_CART_ITEM,
+  UPDATE_CART_ITEM_QUANTITY,
+} from "../graphql/mutations";
+import { GET_CART } from "../graphql/queries";
 import type { Product } from "../lib/product-types";
 
 export interface CartItem {
@@ -41,69 +27,182 @@ interface CartContextType {
   isLoading?: boolean;
 }
 
+interface WooCartNode {
+  key?: string;
+  quantity?: number;
+  variation?: {
+    node?: {
+      attributes?: {
+        nodes?: Array<{
+          name?: string | null;
+          value?: string | null;
+        }>;
+      };
+    };
+  };
+  product?: {
+    node?: {
+      databaseId?: number;
+      slug?: string;
+      name?: string;
+      price?: string | null;
+      image?: {
+        sourceUrl?: string;
+      };
+    };
+  };
+}
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const GET_CART_QUERY = gql(GET_CART);
+const ADD_TO_CART_MUTATION = gql(ADD_TO_CART);
+const REMOVE_CART_ITEM_MUTATION = gql(REMOVE_CART_ITEM);
+const UPDATE_CART_ITEM_QUANTITY_MUTATION = gql(UPDATE_CART_ITEM_QUANTITY);
+const EMPTY_CART_MUTATION = gql(EMPTY_CART);
+
+const parsePrice = (price?: string | null) => {
+  if (!price) {
+    return 0;
+  }
+
+  const parsed = Number.parseFloat(price.replace(/[^0-9.]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getSizeFromNode = (node: WooCartNode) => {
+  const sizeAttribute = node.variation?.node?.attributes?.nodes?.find((attribute) => {
+    const normalizedName = attribute.name?.toLowerCase();
+    return normalizedName === "size" || normalizedName === "pa_size";
+  });
+
+  return sizeAttribute?.value ?? "Default";
+};
+
+const toCartItem = (node: WooCartNode): CartItem | null => {
+  const productNode = node.product?.node;
+  const productId = productNode?.databaseId;
+
+  if (!productNode || !productId) {
+    return null;
+  }
+
+  const price = parsePrice(productNode.price);
+
+  return {
+    key: node.key,
+    size: getSizeFromNode(node),
+    quantity: node.quantity ?? 1,
+    product: {
+      id: productId,
+      slug: productNode.slug ?? String(productId),
+      name: productNode.name ?? "Unknown product",
+      price,
+      regularPrice: price,
+      sizes: [getSizeFromNode(node)],
+      description: "",
+      image: productNode.image?.sourceUrl ?? "",
+    },
+  };
+};
+
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const {
+    data: cartData,
+    loading: cartLoading,
+    error: cartError,
+  } = useQuery(GET_CART_QUERY, {
+    fetchPolicy: "cache-and-network",
+    errorPolicy: "all",
+    ssr: false,
+  });
 
-  /* ─── SWAP POINT: addItem ─── */
-  /* Replace with: useMutation(ADD_TO_CART, { variables: { productId, quantity: 1, variation: [{ attributeName: "pa_size", attributeValue: size }] } }) */
-  const addItem = useCallback((product: Product, size: string) => {
-    setItems((prev) => {
-      const existing = prev.find(
-        (item) => item.product.id === product.id && item.size === size
-      );
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id && item.size === size
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { product, size, quantity: 1 }];
-    });
-  }, []);
+  const [addToCartMutation, { loading: adding }] = useMutation(ADD_TO_CART_MUTATION, {
+    refetchQueries: [GET_CART_QUERY],
+    awaitRefetchQueries: true,
+  });
+  const [removeCartItemMutation, { loading: removing }] = useMutation(REMOVE_CART_ITEM_MUTATION, {
+    refetchQueries: [GET_CART_QUERY],
+    awaitRefetchQueries: true,
+  });
+  const [updateCartItemQuantityMutation, { loading: updating }] = useMutation(
+    UPDATE_CART_ITEM_QUANTITY_MUTATION,
+    {
+      refetchQueries: [GET_CART_QUERY],
+      awaitRefetchQueries: true,
+    }
+  );
+  const [emptyCartMutation, { loading: clearing }] = useMutation(EMPTY_CART_MUTATION, {
+    refetchQueries: [GET_CART_QUERY],
+    awaitRefetchQueries: true,
+  });
 
-  /* ─── SWAP POINT: removeItem ─── */
-  /* Replace with: useMutation(REMOVE_CART_ITEM, { variables: { keys: [cartItem.key] } }) */
-  const removeItem = useCallback((productId: number, size: string) => {
-    setItems((prev) =>
-      prev.filter(
-        (item) => !(item.product.id === productId && item.size === size)
-      )
-    );
-  }, []);
+  const nodes: WooCartNode[] = cartData?.cart?.contents?.nodes ?? [];
+  const items = nodes.map(toCartItem).filter((item): item is CartItem => Boolean(item));
 
-  /* ─── SWAP POINT: updateQuantity ─── */
-  /* Replace with: useMutation(UPDATE_CART_ITEM_QUANTITY, { variables: { key: cartItem.key, quantity } }) */
-  const updateQuantity = useCallback(
-    (productId: number, size: string, quantity: number) => {
-      if (quantity <= 0) {
-        removeItem(productId, size);
+  const getItemKey = useCallback(
+    (productId: number, size: string) =>
+      items.find((item) => item.product.id === productId && item.size === size)?.key,
+    [items]
+  );
+
+  const addItem = useCallback(
+    (product: Product, size: string) => {
+      if (cartError) {
         return;
       }
-      setItems((prev) =>
-        prev.map((item) =>
-          item.product.id === productId && item.size === size
-            ? { ...item, quantity }
-            : item
-        )
-      );
+
+      void addToCartMutation({
+        variables: {
+          productId: product.id,
+          quantity: 1,
+          variation: [{ attributeName: "pa_size", attributeValue: size }],
+        },
+      });
     },
-    [removeItem]
+    [addToCartMutation, cartError]
   );
 
-  /* ─── SWAP POINT: clearCart ─── */
-  /* Replace with: useMutation(EMPTY_CART) */
+  const removeItem = useCallback(
+    (productId: number, size: string) => {
+      const key = getItemKey(productId, size);
+      if (!key || cartError) {
+        return;
+      }
+
+      void removeCartItemMutation({ variables: { keys: [key] } });
+    },
+    [cartError, getItemKey, removeCartItemMutation]
+  );
+
+  const updateQuantity = useCallback(
+    (productId: number, size: string, quantity: number) => {
+      const key = getItemKey(productId, size);
+      if (!key || cartError) {
+        return;
+      }
+
+      if (quantity <= 0) {
+        void removeCartItemMutation({ variables: { keys: [key] } });
+        return;
+      }
+
+      void updateCartItemQuantityMutation({ variables: { key, quantity } });
+    },
+    [cartError, getItemKey, removeCartItemMutation, updateCartItemQuantityMutation]
+  );
+
   const clearCart = useCallback(() => {
-    setItems([]);
-  }, []);
+    if (cartError) {
+      return;
+    }
+
+    void emptyCartMutation();
+  }, [cartError, emptyCartMutation]);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
+  const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const isLoading = cartLoading || adding || removing || updating || clearing;
 
   return (
     <CartContext.Provider
@@ -115,6 +214,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         totalItems,
         subtotal,
+        isLoading,
       }}
     >
       {children}
