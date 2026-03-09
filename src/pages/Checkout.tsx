@@ -21,7 +21,7 @@ import { useCart } from "../context/CartContext";
  */
 
 export default function Checkout() {
-  const { items, subtotal, clearCart } = useCart();
+  const { items, subtotal, clearCart, isLoading, error } = useCart();
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -43,6 +43,33 @@ export default function Checkout() {
     clearCart();
     setOrderPlaced(true);
   };
+
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <p className="text-brand-offwhite/60 font-body uppercase tracking-wider">Loading checkout…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center">
+          <h1 className="font-heading text-3xl text-brand-offwhite mb-4">Unable to Load Checkout</h1>
+          <p className="text-brand-offwhite/60 font-body mb-6">{error}</p>
+          <AppLink
+            href="/shop"
+            data-testid="link-go-shopping"
+            className="text-gold text-sm uppercase tracking-wider font-body"
+          >
+            Start Shopping
+          </AppLink>
+        </div>
+      </div>
+    );
+  }
 
   if (orderPlaced) {
     return (
