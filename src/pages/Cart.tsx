@@ -4,7 +4,32 @@ import { Minus, Plus, X, ArrowLeft, ShoppingBag } from "lucide-react";
 import { useCart } from "../context/CartContext";
 
 export default function Cart() {
-  const { items, removeItem, updateQuantity, subtotal } = useCart();
+  const { items, removeItem, updateQuantity, subtotal, isLoading, error } = useCart();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <p className="text-brand-offwhite/60 font-body uppercase tracking-wider">Loading cart…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <h1 className="font-heading text-3xl text-brand-offwhite mb-4">Unable to Load Cart</h1>
+          <p className="text-brand-offwhite/60 font-body mb-6">{error}</p>
+          <AppLink
+            href="/shop"
+            className="inline-flex items-center gap-2 border border-gold text-gold px-8 py-3 text-xs uppercase tracking-widest font-body hover:bg-gold hover:text-black transition-all duration-500 rounded-md"
+          >
+            Continue Shopping
+          </AppLink>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
