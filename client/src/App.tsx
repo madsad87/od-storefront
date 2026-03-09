@@ -22,8 +22,12 @@ function ProductDetailRoute({ params }: { params: { id: string } }) {
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/shop" component={Shop} />
+      <Route path="/">
+        <Home />
+      </Route>
+      <Route path="/shop">
+        <Shop />
+      </Route>
       <Route path="/product/:id" component={ProductDetailRoute} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
