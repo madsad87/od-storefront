@@ -1,29 +1,19 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AppLink } from "../lib/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useCart } from "../context/CartContext";
-
-/**
- * MIGRATION NOTE:
- * For WooCommerce, two checkout strategies:
- *
- * 1. HYBRID (Recommended for dropshipping):
- *    Redirect to WooCommerce native checkout page.
- *    const checkoutUrl = `${WORDPRESS_URL}/checkout?session=${sessionToken}`;
- *    window.location.href = checkoutUrl;
- *    This leverages existing payment gateway integrations (Stripe, PayPal, etc.)
- *
- * 2. FULLY HEADLESS:
- *    Use the CHECKOUT mutation from graphql/mutations.ts.
- *    Requires rebuilding payment gateway integration on the frontend.
- *    More complex but keeps the user on your domain.
- */
+import {
+  createCheckoutStrategy,
+  type CheckoutFormData,
+} from "../features/checkout/checkout-strategy";
 
 export default function Checkout() {
-  const { items, subtotal, clearCart } = useCart();
-  const [orderPlaced, setOrderPlaced] = useState(false);
-  const [form, setForm] = useState({
+  const { items, subtotal } = useCart();
+  const checkoutStrategy = useMemo(() => createCheckoutStrategy(), []);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [form, setForm] = useState<CheckoutFormData>({
     name: "",
     email: "",
     address: "",
@@ -38,44 +28,29 @@ export default function Checkout() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearCart();
-    setOrderPlaced(true);
-  };
+    setCheckoutError(null);
+    setIsSubmitting(true);
 
-  if (orderPlaced) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          className="text-center max-w-md"
-        >
-          <div className="w-16 h-16 rounded-full border-2 border-gold flex items-center justify-center mx-auto mb-6">
-            <Check className="w-8 h-8 text-gold" />
-          </div>
-          <h1
-            data-testid="text-order-confirmed"
-            className="font-heading text-3xl sm:text-4xl text-brand-offwhite mb-4"
-          >
-            Order Confirmed
-          </h1>
-          <p className="text-brand-offwhite/50 mb-8 font-body leading-relaxed">
-            Your rebellion has been shipped. Expect the extraordinary to arrive at your door soon.
-          </p>
-          <AppLink
-            href="/shop"
-            data-testid="link-continue-shopping-confirmed"
-            className="inline-flex items-center gap-2 border border-gold text-gold px-8 py-3 text-xs uppercase tracking-widest font-body hover:bg-gold hover:text-black transition-all duration-500 rounded-md"
-          >
-            Continue Shopping
-          </AppLink>
-        </motion.div>
-      </div>
-    );
-  }
+    try {
+      const cartSessionToken = localStorage.getItem("woocommerce-session") ?? undefined;
+
+      await checkoutStrategy.completeCheckout({
+        form,
+        session: {
+          cartSessionToken,
+        },
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to start checkout. Please try again.";
+      setCheckoutError(message);
+      setIsSubmitting(false);
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -300,12 +275,18 @@ export default function Checkout() {
                     <span className="text-brand-offwhite text-lg">${subtotal}</span>
                   </div>
                 </div>
+                {checkoutError ? (
+                  <p className="text-xs text-red-400 font-body mb-4" data-testid="text-checkout-error">
+                    {checkoutError}
+                  </p>
+                ) : null}
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   data-testid="button-place-order"
-                  className="w-full bg-gold text-black py-3.5 text-xs uppercase tracking-widest font-body font-bold hover:opacity-90 transition-opacity duration-300 rounded-md"
+                  className="w-full bg-gold text-black py-3.5 text-xs uppercase tracking-widest font-body font-bold hover:opacity-90 transition-opacity duration-300 rounded-md disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Place Order
+                  {isSubmitting ? "Redirecting…" : "Place Order"}
                 </button>
               </div>
             </motion.div>
