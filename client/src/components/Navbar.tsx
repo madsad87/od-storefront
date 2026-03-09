@@ -48,23 +48,19 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4 h-16 sm:h-20">
             <AppLink
-              href="/cart"
-              data-testid="link-cart-icon"
-              className="relative group"
-              aria-label="Shopping cart"
+              href="/"
+              data-testid="link-logo"
+              className="group"
+              aria-label="Outlaw Dolls home"
             >
-              <ShoppingBag className="w-5 h-5 text-brand-offwhite transition-colors duration-300 group-hover:text-gold" />
-              {totalItems > 0 && (
-                <span
-                  data-testid="badge-cart-count"
-                  className="absolute -top-2 -right-2 w-4 h-4 bg-gold text-black text-[10px] font-bold rounded-full flex items-center justify-center"
-                >
-                  {totalItems}
-                </span>
-              )}
+              <img
+                src="/od-monogram.svg"
+                alt="Outlaw Dolls logo"
+                className="h-10 w-10 sm:h-12 sm:w-12 object-contain transition-opacity duration-300 group-hover:opacity-80"
+              />
             </AppLink>
 
-            <AppLink href="/" data-testid="link-logo" className="absolute left-1/2 -translate-x-1/2">
+            <AppLink href="/" data-testid="link-wordmark" className="absolute left-1/2 -translate-x-1/2">
               <h1 className="font-heading text-lg sm:text-xl tracking-brand text-brand-offwhite uppercase whitespace-nowrap">
                 Outlaw Dolls
               </h1>
@@ -83,14 +79,33 @@ export default function Navbar() {
               ))}
             </div>
 
-            <button
-              data-testid="button-mobile-menu"
-              className="md:hidden text-brand-offwhite"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+            <div className="flex items-center gap-4">
+              <AppLink
+                href="/cart"
+                data-testid="link-cart-icon"
+                className="relative group"
+                aria-label="Shopping cart"
+              >
+                <ShoppingBag className="w-5 h-5 text-brand-offwhite transition-colors duration-300 group-hover:text-gold" />
+                {totalItems > 0 && (
+                  <span
+                    data-testid="badge-cart-count"
+                    className="absolute -top-2 -right-2 w-4 h-4 bg-gold text-black text-[10px] font-bold rounded-full flex items-center justify-center"
+                  >
+                    {totalItems}
+                  </span>
+                )}
+              </AppLink>
+
+              <button
+                data-testid="button-mobile-menu"
+                className="md:hidden text-brand-offwhite"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              >
+                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
         </div>
       </nav>
