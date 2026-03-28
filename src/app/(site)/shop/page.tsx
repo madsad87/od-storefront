@@ -1,7 +1,7 @@
 import { createApolloClient } from '@/lib/apollo/client';
 import { SHOP_PRODUCTS_QUERY } from '@/lib/graphql/queries/shop';
 
-export const revalidate = 120;
+export const dynamic = 'force-dynamic';
 
 export default async function ShopPage() {
   const client = createApolloClient();
@@ -9,6 +9,7 @@ export default async function ShopPage() {
   const { data, error } = await client.query({
     query: SHOP_PRODUCTS_QUERY,
     variables: { first: 12 },
+    fetchPolicy: 'no-cache',
   });
 
   if (error) {
