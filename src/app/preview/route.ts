@@ -1,3 +1,4 @@
+import type { Route } from 'next';
 import { draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { NextRequest } from 'next/server';
@@ -34,5 +35,5 @@ export async function GET(request: NextRequest) {
 
   (await draftMode()).enable();
   const path = resolvePreviewPath(node.__typename, node.slug);
-  redirect(path);
+  redirect(path as Route);
 }
