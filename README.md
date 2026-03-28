@@ -5,6 +5,14 @@ Fresh rebuild of the women’s fashion storefront.
 ## Legacy code archive
 The previous codebase is preserved on the `archive/legacy-code` branch.
 
+## Runtime/build baseline
+
+- Node.js: `22.x`
+- npm: `10.x`
+- package manager: `npm@10.9.7`
+
+These are pinned in `package.json` to match WP Engine Atlas build defaults and avoid drift.
+
 ## Local development
 
 1. Copy environment template:
