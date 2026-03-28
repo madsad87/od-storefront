@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { createApolloClient } from '@/lib/apollo/client';
 import { PRODUCT_BY_SLUG_QUERY } from '@/lib/graphql/queries/product';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 120;
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -22,7 +22,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const { data } = await client.query({
     query: PRODUCT_BY_SLUG_QUERY,
     variables: { slug },
-    fetchPolicy: 'no-cache',
   });
 
   const product = data?.product;
