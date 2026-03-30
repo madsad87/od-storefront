@@ -3,6 +3,13 @@ import { SHOP_PRODUCTS_QUERY } from '@/lib/graphql/queries/shop';
 
 export const dynamic = 'force-dynamic';
 
+import { ProductCard } from '@/components/ui/product-card';
+import { Section } from '@/components/ui/section';
+
+export const dynamic = 'force-dynamic';
+
+const CONTEXTS = ['Dinner', 'Drinks', 'After dark'];
+
 export default async function ShopPage() {
   const client = createApolloClient();
 
@@ -14,7 +21,7 @@ export default async function ShopPage() {
 
   if (error) {
     return (
-      <main>
+      <main className="page-shell">
         <h1>Shop</h1>
         <p>We couldn&apos;t load products right now. Please try again shortly.</p>
       </main>
@@ -24,19 +31,29 @@ export default async function ShopPage() {
   const products = data?.products?.nodes ?? [];
 
   return (
-    <main>
-      <h1>Shop</h1>
-      {products.length === 0 ? (
-        <p>No products found.</p>
-      ) : (
-        <ul>
-          {products.map((product: any) => (
-            <li key={product.databaseId}>
-              <a href={`/product/${product.slug}`}>{product.name}</a> — {product.price ?? 'Price pending'}
-            </li>
-          ))}
-        </ul>
-      )}
+    <main className="page-shell">
+      <Section
+        eyebrow="All Fits"
+        title="Curated for nights with a plan"
+        description="Minimal edits, maximum intent."
+      >
+        {products.length === 0 ? (
+          <p>No products found.</p>
+        ) : (
+          <div className="product-grid" id="fits">
+            {products.map((product: any, index: number) => (
+              <ProductCard
+                key={product.databaseId}
+                slug={product.slug}
+                name={product.name}
+                price={product.price}
+                image={product.image}
+                wearItTo={CONTEXTS[index % CONTEXTS.length]}
+              />
+            ))}
+          </div>
+        )}
+      </Section>
     </main>
   );
 }

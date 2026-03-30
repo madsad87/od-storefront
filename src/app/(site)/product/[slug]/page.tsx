@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
 import { createApolloClient } from '@/lib/apollo/client';
 import { PRODUCT_BY_SLUG_QUERY } from '@/lib/graphql/queries/product';
+import { SHOP_PRODUCTS_QUERY } from '@/lib/graphql/queries/shop';
+import { ProductCard } from '@/components/ui/product-card';
+import { PurchasePanel } from '@/components/product/purchase-panel';
+import { Section } from '@/components/ui/section';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 120;
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -11,7 +15,7 @@ type ProductPageProps = {
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   return {
-    title: `Product: ${slug}`,
+    title: `Fit: ${slug}`,
   };
 }
 
@@ -19,27 +23,70 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
   const client = createApolloClient();
 
-  const { data } = await client.query({
-    query: PRODUCT_BY_SLUG_QUERY,
-    variables: { slug },
-    fetchPolicy: 'no-cache',
-  });
+  const [{ data: productData }, { data: recommendationsData }] = await Promise.all([
+    client.query({
+      query: PRODUCT_BY_SLUG_QUERY,
+      variables: { slug },
+    }),
+    client.query({ query: SHOP_PRODUCTS_QUERY, variables: { first: 4 } }),
+  ]);
 
-  const product = data?.product;
+  const product = productData?.product;
+  const recommendations = (recommendationsData?.products?.nodes ?? []).filter(
+    (item: any) => item.slug !== slug,
+  );
 
   if (!product) {
     return (
-      <main>
+      <main className="page-shell">
         <h1>Product not found</h1>
       </main>
     );
   }
 
   return (
-    <main>
-      <h1>{product.name}</h1>
-      <p>{product.price ?? product.regularPrice ?? 'Price unavailable'}</p>
-      <article dangerouslySetInnerHTML={{ __html: product.description ?? '' }} />
+    <main className="page-shell">
+      <section className="pdp-grid">
+        <div className="pdp-media">
+          {product.image?.sourceUrl ? (
+            <img src={product.image.sourceUrl} alt={product.image.altText ?? product.name} />
+          ) : (
+            <div className="product-media-placeholder">Image incoming</div>
+          )}
+        </div>
+
+        <div>
+          <h1>{product.name}</h1>
+          <PurchasePanel
+            price={product.price ?? product.regularPrice ?? 'Price unavailable'}
+            shortDescription={product.shortDescription}
+          />
+          <div className="editorial-note">
+            <h2>Styling guidance</h2>
+            <p>
+              Wear with clean hardware, sharp tailoring, and one statement piece. Built for dinner plans that turn
+              into a longer night.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="pdp-description" dangerouslySetInnerHTML={{ __html: product.description ?? '' }} />
+
+      <Section eyebrow="Complete the look" title="Pair it with these finishes">
+        <div className="product-grid product-grid-compact">
+          {recommendations.map((item: any) => (
+            <ProductCard
+              key={item.databaseId}
+              slug={item.slug}
+              name={item.name}
+              price={item.price}
+              image={item.image}
+              wearItTo="After dark"
+            />
+          ))}
+        </div>
+      </Section>
     </main>
   );
 }

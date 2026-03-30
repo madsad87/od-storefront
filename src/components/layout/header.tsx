@@ -24,6 +24,26 @@ export function Header() {
               {link.label}
             </Link>
           ))}
+          <Link href="/checkout" className="pill-link">
+            Checkout
+          </Link>
+        </nav>
+
+        <button className="menu-toggle" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen}>
+          Menu
+        </button>
+      </div>
+
+      <div className={`mobile-nav-panel ${menuOpen ? 'open' : ''}`}>
+        <nav className="mobile-nav" aria-label="Mobile navigation">
+          {NAV_LINKS.map((link) => (
+            <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}>
+              {link.label}
+            </Link>
+          ))}
+          <Link href="/checkout" onClick={() => setMenuOpen(false)}>
+            Checkout
+          </Link>
         </nav>
       </div>
     </header>
