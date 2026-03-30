@@ -1,26 +1,24 @@
-'use client';
-
+import type { Route } from 'next';
 import Link from 'next/link';
-import { useState } from 'react';
 
-const NAV_LINKS = [
+type NavLink = {
+  href: Route;
+  label: string;
+};
+
+const NAV_LINKS: NavLink[] = [
+  { href: '/', label: 'Home' },
   { href: '/shop', label: 'Shop' },
-  { href: '/shop#drops', label: 'Drops' },
-  { href: '/shop#fits', label: 'Fits' },
   { href: '/cart', label: 'Cart' },
+  { href: '/checkout', label: 'Checkout' },
 ];
 
 export function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
   return (
-    <header className="site-header">
-      <div className="container nav-shell">
-        <Link href="/" className="brand-mark">
-          OD / AFTER HOURS
-        </Link>
-
-        <nav className="desktop-nav" aria-label="Primary navigation">
+    <header style={{ borderBottom: '1px solid #e5e2dc', background: '#fff' }}>
+      <div style={{ maxWidth: 1120, margin: '0 auto', padding: '1rem' }}>
+        <nav style={{ display: 'flex', gap: '1rem', alignItems: 'center' }} aria-label="Primary navigation">
+          <strong>OD Storefront</strong>
           {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href}>
               {link.label}

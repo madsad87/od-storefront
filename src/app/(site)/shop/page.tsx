@@ -1,5 +1,8 @@
 import { createApolloClient } from '@/lib/apollo/client';
 import { SHOP_PRODUCTS_QUERY } from '@/lib/graphql/queries/shop';
+
+export const dynamic = 'force-dynamic';
+
 import { ProductCard } from '@/components/ui/product-card';
 import { Section } from '@/components/ui/section';
 
