@@ -1,7 +1,8 @@
 export function Footer() {
   return (
-    <footer style={{ borderTop: '1px solid #e5e2dc', background: '#fff' }}>
-      <div style={{ maxWidth: 1120, margin: '0 auto', padding: '1rem' }}>
+    <footer className="site-footer">
+      <div className="container footer-shell">
+        <p>OD Storefront — Curated night-out fits.</p>
         <small>© {new Date().getFullYear()} OD Storefront</small>
       </div>
     </footer>
