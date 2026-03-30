@@ -1,5 +1,6 @@
 'use client';
 
+import type { Route } from 'next';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -22,7 +23,7 @@ export function Header() {
 
         <nav className="desktop-nav" aria-label="Primary navigation">
           {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href}>
+            <Link key={link.href} href={link.href as Route}>
               {link.label}
             </Link>
           ))}
