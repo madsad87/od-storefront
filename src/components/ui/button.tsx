@@ -1,5 +1,5 @@
 import Link from 'next/link';
-
+import type { Route } from 'next';
 type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
 import type { ReactNode } from 'react';
@@ -19,7 +19,7 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
 
 export function ButtonLink({ href, children, variant = 'primary', className = '' }: ButtonLinkProps) {
   return (
-    <Link href={href} className={`${VARIANT_CLASS[variant]} ${className}`.trim()}>
+    <Link href={href as Route} className={`${VARIANT_CLASS[variant]} ${className}`.trim()}>
       {children}
     </Link>
   );
