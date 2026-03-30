@@ -40,7 +40,7 @@ export function Header() {
       <div className={`mobile-nav-panel ${menuOpen ? 'open' : ''}`}>
         <nav className="mobile-nav" aria-label="Mobile navigation">
           {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}>
+            <Link key={link.href} href={link.href as Route} onClick={() => setMenuOpen(false)}>
               {link.label}
             </Link>
           ))}
