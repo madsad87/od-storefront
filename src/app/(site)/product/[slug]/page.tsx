@@ -33,8 +33,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const product = productData?.product;
   const recommendations = (recommendationsData?.products?.nodes ?? []).filter(
-    (item: any) => item.slug !== slug,
+    (item: any) => item?.slug && item.slug !== slug,
   );
+
+  const productName = product?.name ?? 'Product';
+  const productImage = product?.image;
+  const productPrice = product?.price ?? product?.regularPrice ?? 'Price unavailable';
+  const productDescription = product?.description ?? '';
 
   if (!product) {
     return (
@@ -48,19 +53,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <main className="page-shell">
       <section className="pdp-grid">
         <div className="pdp-media">
-          {product.image?.sourceUrl ? (
-            <img src={product.image.sourceUrl} alt={product.image.altText ?? product.name} />
+          {productImage?.sourceUrl ? (
+            <img src={productImage.sourceUrl} alt={productImage.altText ?? productName} />
           ) : (
             <div className="product-media-placeholder">Image incoming</div>
           )}
         </div>
 
         <div>
-          <h1>{product.name}</h1>
-          <PurchasePanel
-            price={product.price ?? product.regularPrice ?? 'Price unavailable'}
-            shortDescription={product.shortDescription}
-          />
+          <h1>{productName}</h1>
+          <PurchasePanel price={productPrice} shortDescription={product.shortDescription} />
           <div className="editorial-note">
             <h2>Styling guidance</h2>
             <p>
@@ -71,7 +73,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
       </section>
 
-      <section className="pdp-description" dangerouslySetInnerHTML={{ __html: product.description ?? '' }} />
+      <section className="pdp-description" dangerouslySetInnerHTML={{ __html: productDescription }} />
 
       <Section eyebrow="Complete the look" title="Pair it with these finishes">
         <div className="product-grid product-grid-compact">
