@@ -4,6 +4,7 @@ import { ButtonLink } from '@/components/ui/button';
 import { ProductCard } from '@/components/ui/product-card';
 import { Section } from '@/components/ui/section';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
 const NIGHT_SCENARIOS = [
